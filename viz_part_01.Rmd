@@ -119,7 +119,7 @@ weather_df %>%
 weather_plot = ggplot(weather_df, aes(x = tmin, y = tmax)) + 
   geom_point(aes(color = name), alpha = .5) 
 
-ggsave("Results/weather_plot.pdf", weather_plot, width = 8, height = 5)
+ggsave("weather_plot.pdf", weather_plot, width = 8, height = 5)
 ```
 
 
