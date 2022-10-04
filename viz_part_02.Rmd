@@ -1,13 +1,13 @@
 ---
 title: "viz_part_01"
 author: "Yujie Huang"
-output: htlm_document
+output: github_document
 date: "2022-09-29"
 editor_options: 
   chunk_output_type: console
 ---
 
-# let's import data
+## let's import data
 
 ```{r}
 library(tidyverse)
@@ -30,107 +30,35 @@ weather_df =
     tmax = tmax / 10) %>%
   select(name, id, everything())
 ```
-##let's make a scatterplot
+
+
+## scatterplot
 
 ```{r}
-ggplot(weather_df, aes(x=tmin, y=tmax)) + geom_point()
-```
-```{r}
-weather_df %>%
-  drop_na() %>% 
-  ggplot(aes(x = tmin, y = tmax)) + 
-  geom_point()
-```
-
-```{r}
-weather_scatterplot = 
-  weather_df %>% 
-  drop_na () %>% 
-  ggplot (aes(x=tmin, y=tmax))
-
-weather_scatterplot+geom_point()
-
-  
-```
-
-```{r}
- weather_df %>% 
-  drop_na () %>% 
-  ggplot (aes(x=tmin, y=tmax, color=name))+geom_point()
-
-```
-### if add "color=name" in the "ggplot" we can apply it all ggplots. if add "color=name" in the "geom_point" we can apply it in that geom point figure.
-
-
-```{r}
- weather_df %>% 
-  drop_na () %>% 
-  ggplot (aes(x=tmin, y=tmax))+geom_point(aes(color=name))+
-geom_smooth()
-```
-```{r}
-ggplot(weather_df, aes(x = tmin, y = tmax)) + 
-  geom_point(aes(color = name), alpha = .5) +
-  geom_smooth(se = FALSE)
+ggplot_weather=
+  weather_df %>%  
+  ggplot(aes(x = tmin, y = tmax, color=name)) + 
+  geom_point(alpha=0.5)+
+   labs(
+    title = "Temperature plot",
+    x = "Minimum daily temperature (C)",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  )+
+  scale_x_continuous(
+    breaks= c(-10, 0, 15),
+    labels = c("-10c", "0c", "15c")
+  ) + 
+  viridis::scale_color_viridis(
+    name = "Location", 
+    discrete = TRUE
+  )
 ```
 
 ```{r}
-ggplot(weather_df, aes(x = tmin, y = tmax, color = name)) + 
-  geom_point(alpha = .5) +
-  geom_smooth(se = FALSE) + 
-  facet_grid(. ~ name)
+ggplot_weather+ 
+  theme_minimal() +
+  theme(legend.position = "bottom")
+ 
 ```
-```{r}
-ggplot(weather_df, aes(x = date, y = tmax, color = name)) + 
-  geom_point(aes(size=prcp),alpha=0.3)+
-  geom_smooth(se = FALSE) +
-  facet_grid(.~name)+
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-```
-
-## some quick studd
-
-```{r}
-weather_df %>% 
-  ggplot (aes(x=tmin, y=tmax))+ geom_hex()
-
-```
-## univariate plots
-
-```{r}
-ggplot(weather_df, aes(x = tmax, fill = name)) + 
-  geom_histogram(position = "dodge", binwidth = 2)
-```
-
-```{r}
-weather_df %>% 
-  ggplot (aes(x=name, y=tmax, fill=name))+
-  geom_boxplot()
-```
-
-```{r}
-weather_df %>% 
-  ggplot (aes(x=name, y=tmax, fill=name))+
-  geom_violin()
-```
-##saving and embedding plots
-
-```{r}
-weather_plot = ggplot(weather_df, aes(x = tmin, y = tmax)) + 
-  geom_point(aes(color = name), alpha = .5) 
-
-ggsave("weather_plot.pdf", weather_plot, width = 8, height = 5)
-```
-
-
-
-
-
-
-
-
-
-
-
-
 
