@@ -12,6 +12,7 @@ editor_options:
 ```{r}
 library(tidyverse)
 library(ggridges)
+library(patchwork)
 ```
 ```{r}
 weather_df = 
@@ -61,4 +62,90 @@ ggplot_weather+
   theme(legend.position = "bottom")
  
 ```
+
+
+```{r}
+
+central_park = 
+  weather_df %>% 
+  filter(name == "CentralPark_NY")
+
+waikiki = 
+  weather_df %>% 
+  filter(name == "Waikiki_HA")
+
+ggplot(data = waikiki, aes(x = date, y = tmax, color = name)) + 
+  geom_point() + 
+  geom_line(data = central_park)
+
+```
+
+
+
+## Patchwork...
+
+```{r}
+tmax_tmin_plot=
+  weather_df %>% 
+  ggplot (aes(x=tmin, y=tmax, color=name))+
+  geom_point()+
+  theme(legend.position = "none")
+
+
+prcp_density_plot=
+  weather_df %>% 
+  filter (prcp > 0) %>% 
+  ggplot(aes(x = prcp, fill = name)) + 
+  geom_density(alpha = .5) + 
+  theme(legend.position = "none")
+
+tmax_date_plot = 
+  weather_df %>% 
+  ggplot(aes(x = date, y = tmax, color = name)) + 
+  geom_point(alpha = .5) +
+  geom_smooth(se = FALSE) + 
+  theme(legend.position = "none")
+
+
+(tmax_tmin_plot + prcp_density_plot)/tmax_date_plot  
+ #patchwork? why it can not be added#
+
+
+```
+
+## Data manipulation
+
+```{r}
+weather_df %>%
+  mutate(name = forcats::fct_relevel(name, c("Waikiki_HA", "CentralPark_NY", "Waterhole_WA"))) %>% 
+  ggplot(aes(x = name, y = tmax)) + 
+  geom_violin(aes(fill = name), color = "blue", alpha = .5) + 
+  theme(legend.position = "bottom")
+
+```
+
+**Also can use fct_reorder under mutate(name= ) function**
+
+
+
+```{r}
+pulse_data = 
+  haven::read_sas("./data/public_pulse_data.sas7bdat") %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m,
+    names_to = "visit", 
+    names_prefix = "bdi_score_",
+    values_to = "bdi") %>%
+  select(id, visit, everything()) %>%
+  mutate(
+    visit = recode(visit, "bl" = "00m"),
+    visit = factor(visit, levels = str_c(c("00", "01", "06", "12"), "m"))) %>%
+  arrange(id, visit)
+
+ggplot(pulse_data, aes(x = visit, y = bdi)) + 
+  geom_boxplot()
+```
+
+
 
